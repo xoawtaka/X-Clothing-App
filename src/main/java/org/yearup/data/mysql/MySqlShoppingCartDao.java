@@ -74,8 +74,26 @@ public class MySqlShoppingCartDao  extends MySqlDaoBase implements ShoppingCartD
     }
 
     @Override
-    public ShoppingCart addItem(int id, int productId, int quantity) {
+    public ShoppingCart addItem(int userId, int productId, int quantity) {
+        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)" +
+                "ON DUPLICATE KEY UPDATE quantity = quantity + ?";
 
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            statement.setInt(2, productId);
+            statement.setInt(3, quantity);
+
+            statement.executeQuery();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return getCart(userId);
+
+
+
+        }
         return null;
     }
 
