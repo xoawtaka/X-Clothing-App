@@ -2,15 +2,22 @@ package org.yearup.models;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShoppingCart
 {
     private Map<Integer, ShoppingCartItem> items = new HashMap<>();
+    private int userId;
 
     public Map<Integer, ShoppingCartItem> getItems()
     {
         return items;
+    }
+
+    public void setUserId(int userId)
+    {
+        this.userId = userId;
     }
 
     public void setItems(Map<Integer, ShoppingCartItem> items)

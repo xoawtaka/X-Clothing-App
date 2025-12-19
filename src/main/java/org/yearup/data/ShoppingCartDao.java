@@ -12,6 +12,7 @@ public interface ShoppingCartDao {
 
         ShoppingCart getByUserId(int userId);
 
+
         // returns the user's cart items
         ShoppingCart getCart(int userId);
 
