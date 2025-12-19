@@ -26,27 +26,36 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
         String sql = "SELECT * FROM products " +
                 "WHERE (category_id = ? OR ? = -1) " +
                 "   AND (price >= ? OR ? = -1) " +
-                "   AND (price <= ? OR ? = -1) " + // was no max price - added placeholder
-                "   AND (subcategory = ? OR ? = '') ";
+                "   AND (price <= ? OR ? = -1) ";
 
         categoryId = categoryId == null ? -1 : categoryId;
-        minPrice = minPrice == null ? new BigDecimal("-1") : minPrice;
-        maxPrice = maxPrice == null ? new BigDecimal("-1") : maxPrice;
-        subCategory = subCategory == null ? "" : subCategory;
+        minPrice   = minPrice   == null ? new BigDecimal("-1") : minPrice;
+        maxPrice   = maxPrice   == null ? new BigDecimal("-1") : maxPrice;
+        subCategory = (subCategory == null ? "" : subCategory.trim());
+
+        StringBuilder sqlBuilder = new StringBuilder(sql);
+
+        boolean filterBySub = !subCategory.isBlank();
+        if (filterBySub) {
+            sqlBuilder.append(" AND subcategory LIKE ? ");
+        }
 
         try (Connection connection = getConnection())
         {
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sqlBuilder.toString());
             statement.setInt(1, categoryId);
             statement.setInt(2, categoryId);
             statement.setBigDecimal(3, minPrice);
-            statement.setBigDecimal(4, minPrice); // added max and rearranged # placeholders
+            statement.setBigDecimal(4, minPrice);
             statement.setBigDecimal(5, maxPrice);
             statement.setBigDecimal(6, maxPrice);
-            statement.setString(7, "%" + subCategory + "%");
-            statement.setString(8, subCategory);
+
+            if (filterBySub) {
+                statement.setString(7, "%" + subCategory + "%");
+            }
 
             ResultSet row = statement.executeQuery();
+
 
             while (row.next())
             {
