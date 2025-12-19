@@ -20,24 +20,33 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
         List<Category> categories = new ArrayList<>();
 
         // get all categories
-        String sql = "SELECT , name, description FROM categories";
+        String sql = "SELECT category_id, name, description FROM categories";
 
-        try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet row = statement.executeQuery();
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery())
+        {
+            while (rs.next())
+            {
+                Category category = new Category();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                category.setDescription(rs.getString("description"));
 
-            while (row.next()) {
-                categories.add(mapRow(row));
+                categories.add(category);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Error getting all categories", e);
+        }
+
         return categories;
     }
 
     @Override
     public Category getById(int categoryId) {
-        String sql = "SELECT , name, description FROM categories WHERE  = ?";
+        String sql = "SELECT category_id, name, description FROM categories WHERE category_id = ?";
 
         // get category by id
         try (Connection connection = getConnection()) {
@@ -45,16 +54,22 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
 
             statement.setInt(1, categoryId);
 
-            ResultSet row = statement.executeQuery();
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    Category category = new Category();
+                    category.setCategoryId(rs.getInt("category_id"));   // or "categoryId" if that's your actual column
+                    category.setName(rs.getString("name"));
+                    category.setDescription(rs.getString("description"));
+                    return category;
 
-            if (row.next()) {
-                return (mapRow(row));
+                } else {
+
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     @Override

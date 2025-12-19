@@ -120,4 +120,8 @@ public class Product
     {
         this.imageUrl = imageUrl;
     }
+
+    public void setSubcategory(String subcategory) {
+
+    }
 }

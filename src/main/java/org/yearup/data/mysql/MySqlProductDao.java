@@ -43,7 +43,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
             statement.setBigDecimal(4, minPrice); // added max and rearranged # placeholders
             statement.setBigDecimal(5, maxPrice);
             statement.setBigDecimal(6, maxPrice);
-            statement.setString(7, subCategory);
+            statement.setString(7, "%" + subCategory + "%");
             statement.setString(8, subCategory);
 
             ResultSet row = statement.executeQuery();
@@ -120,7 +120,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     {
 
         String sql = "INSERT INTO products(name, price, category_id, description, subcategory, image_url, stock, featured) " +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection connection = getConnection())
         {
@@ -196,7 +196,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     {
 
         String sql = "DELETE FROM products " +
-                " WHERE product_id = ?;";
+                "WHERE product_id = ?;";
 
         try (Connection connection = getConnection())
         {
